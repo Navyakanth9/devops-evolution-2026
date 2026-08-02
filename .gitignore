@@ -1,0 +1,9 @@
+# Local terraform directory (contains heavy provider binaries)
+.terraform/
+
+# State files (contains secrets, managed remotely in production)
+*.tfstate
+*.tfstate.backup
+
+# Crash logs
+crash.log
