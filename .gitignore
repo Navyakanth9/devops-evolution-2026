@@ -4,6 +4,7 @@
 # State files (contains secrets, managed remotely in production)
 *.tfstate
 *.tfstate.backup
+.terraform.lock.hcl
 
 # Crash logs
 crash.log
