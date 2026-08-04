@@ -15,3 +15,15 @@ variable "environment_tag" {
   description = "Value for the Environment tag"
   default     = "Development"
 }
+
+variable "dynamic_ami"{
+  type       = string
+  description = "Dynamic AMI ID for the EC2 instance"
+  default     = ""
+}
+
+locals{
+  project_name = "Evolution"
+  full_server_name = "${local.project_name}-server-${var.environment_tag}"
+
+}

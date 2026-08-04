@@ -12,19 +12,25 @@ provider "aws" {
   region = var.aws_region
 }
 
-# 2. DYNAMIC DATA SOURCE: Automatically fetch the official, latest free-tier Amazon Linux 2023 AMI
+
+
+#DYNAMIC DATA SOURCE: Automatically fetch the official, latest free-tier Amazon Linux 2023 AMI
 data "aws_ssm_parameter" "amazon_linux_2023" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+  name = var.dynamic_ami
 }
-#Usevariables defined in variables.tf
-# 3. Create the instance using the dynamic AMI and modern t3.micro (Free Tier)
+
+
+#Use variables defined in variables.tf
+#Create the instance using the dynamic AMI and modern t3.micro (Free Tier)
 resource "aws_instance" "dev_server" {
   ami           = data.aws_ssm_parameter.amazon_linux_2023.value
   instance_type = var.instance_type
 
 
+
+# Define tags for the instance using local variables and input variables
   tags = {
-    Name = "devops-evolution-2026"
+    Name = local.full_server_name
     environment = var.environment_tag
   }
 }
