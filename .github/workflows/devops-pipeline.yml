@@ -21,9 +21,9 @@ jobs:
       # 2. PASSWORDLESS AUTHENTICATION: Authenticate to AWS using OIDC via IAM Role Assume
 
       - name: Configure AWS Credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4.1.0
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::955030484164:role/tf-admin-role
+          role-to-assume: arn:aws:iam::955030484164:role/tf-gha-role
           aws-region: ap-southeast-2
 
       # 3. Terraform Init
@@ -38,4 +38,4 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
 
-        
+
