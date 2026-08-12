@@ -23,7 +23,7 @@ jobs:
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::955030484164:role/github-actions-terraform-role # Paste your exact Role ARN
+          role-to-assume: arn:aws:iam::955030484164:role/tf-automation-execution-role
           aws-region: ap-south-2
 
       # 3. Setup HashiCorp Terraform CLI on the remote cloud runner container
