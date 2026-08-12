@@ -22,9 +22,9 @@ jobs:
 
       # 2. PASSWORDLESS AUTHENTICATION: Authenticate to AWS using OIDC via IAM Role Assume
       - name: Configure AWS Credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v6.2.3
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
-          role-to-assume: ${{ secrets.AWS_IAM_ROLE}}
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ap-south-2
 
       # 3. Setup HashiCorp Terraform CLI on the remote cloud runner container
