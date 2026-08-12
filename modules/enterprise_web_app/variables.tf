@@ -54,7 +54,7 @@ variable "ami_id" {
 variable "script_path" {
   description = "The path to the user data script"
   type        = string
-  default     = "./modules/enterprise_web_app/userdata.sh"
+  default     = "./modules/enterprise_web_app/exp.sh"
   }
   
   variable "project_tags" {

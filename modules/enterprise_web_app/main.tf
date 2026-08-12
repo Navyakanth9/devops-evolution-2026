@@ -90,7 +90,7 @@ resource "aws_instance" "web_server" {
 
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
-  user_data    = filebase64(var.script_path)
+  user_data_base64    = filebase64(var.script_path)
 
   tags = { Name = var.project_tags["Name"] }
 }
