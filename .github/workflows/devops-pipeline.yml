@@ -1,33 +1,45 @@
-# CICD workflow for DevOps Evolution 2026 project
-name: DevOps Evolution 2026 Pipeline
+name: DevOps Evolution CI-CD Pipeline
 
-
-# 2. THE TRIGGER: When should this automation execute?
 on:
   push:
     branches:
-      - main
-      - hardcode
+      - hardcode # Triggers on your active branch
 
-# 3. THE WORK: What actions should the remote machine take?
+# CRUCIAL FOR OIDC: Allows the runner to request secure identity tokens from AWS
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  build-and-verify:
-
-      # Tell GitHub to spin up a fresh, free Ubuntu Linux cloud container for you
+  terraform-pipeline:
     runs-on: ubuntu-latest
-
+    
     steps:
-      # Step A: Clone your GitHub repository code down onto the remote container
+      # 1. Clone the repository code
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
 
-     - name: checkout code
-       uses: actions/checkout@v4
+      # 2. PASSWORDLESS AUTHENTICATION: Authenticate to AWS using OIDC via IAM Role Assume
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::955030484164:role/github-actions-terraform-role # Paste your exact Role ARN
+          aws-region: ap-south-2
 
-        # Step B: Run a simple echo command to verify execution
-     - name: Execute Shell testing greeting
-       run: |
-          echo "=========================================================="
-          echo "HELLO NAVYAKANTH! YOUR AUTOMATION WORKS LIVE ON THE CLOUD"
-          echo "======================================================="
+      # 3. Setup HashiCorp Terraform CLI on the remote cloud runner container
+      - name: Setup Terraform Engine
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
 
-      # Step C: Set up Terraform on the remote container   
+      # 4. Initialize Backend (Connects directly to your secure S3 Bucket)
+      - name: Terraform Init
+        run: terraform init -reconfigure
+
+      # 5. Lint and Format Check (Fails pipeline if code spacing is messy)
+      - name: Terraform Format Validate
+        run: terraform fmt -check
+
+      # 6. Generate the Execution Plan
+      - name: Terraform Plan
+        run: terraform plan -auto-approve
