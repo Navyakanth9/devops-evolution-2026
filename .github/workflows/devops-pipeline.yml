@@ -28,6 +28,6 @@ jobs:
        run: |
           echo "=========================================================="
           echo "HELLO NAVYAKANTH! YOUR AUTOMATION WORKS LIVE ON THE CLOUD"
-          echo "=======================================================
+          echo "======================================================="
 
       # Step C: Set up Terraform on the remote container   
