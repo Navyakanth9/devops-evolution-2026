@@ -1,26 +1,28 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
-# Configuring the backend to use s3 for state storage 
-  backend "s3" {
-    bucket = "terraform-state-navyakanth-2026"
-    key = "global/s3/terraform.tfstate"
-    region ="us-east-1"
-    use_lockfile = true // Enable state locking to prevent concurrent modifications
+
+backend s3 {
+    bucket = "terraform-remote-state-nk"
+    key    = "global/s3/terraform.tfstate"
     encrypt = true
+    use_lockfile = true
+    region = "ap-south-2"
   }
+} 
 
-}
 
-#Use the variables defined in variables.tf
 provider "aws" {
   region = var.aws_region
-
 }
 
-
-
+module "enterprise_web_app" {
+  source = "./modules/enterprise_web_app"
+  project_tags = {
+    Name = "evolution-web-app"
+  }
+}
