@@ -2,8 +2,9 @@ name: DevOps Evolution CI-CD Pipeline
 
 on:
   push:
-    branches:
-      - hardcode # Triggers on your active branch
+    branches: [hardcode]
+
+  workflow_dispatch:
 
 # CRUCIAL FOR OIDC: Allows the runner to request secure identity tokens from AWS
 permissions:
