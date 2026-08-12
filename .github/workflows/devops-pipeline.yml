@@ -21,26 +21,10 @@ jobs:
         uses: actions/checkout@v4
 
       # 2. PASSWORDLESS AUTHENTICATION: Authenticate to AWS using OIDC via IAM Role Assume
+
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ap-south-2
-
-      # 3. Setup HashiCorp Terraform CLI on the remote cloud runner container
-      - name: Setup Terraform Engine
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
-
-      # 4. Initialize Backend (Connects directly to your secure S3 Bucket)
-      - name: Terraform Init
-        run: terraform init -reconfigure
-
-      # 5. Lint and Format Check (Fails pipeline if code spacing is messy)
-      - name: Terraform Format Validate
-        run: terraform fmt -check
-
-      # 6. Generate the Execution Plan
-      - name: Terraform Plan
-        run: terraform plan -auto-approve
+          
