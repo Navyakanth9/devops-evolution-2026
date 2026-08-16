@@ -26,6 +26,12 @@ jobs:
           aws-region: ap-south-2
           role-session-name: terraform-session
 
+     #install terraform
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.6 
+
       # 3. Terraform Init
       - name: Terraform Init
         run: sudo terraform init  
