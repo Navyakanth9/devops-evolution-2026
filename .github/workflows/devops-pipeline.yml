@@ -45,6 +45,6 @@ jobs:
 
       # 5. Terraform Apply
       - name: Terraform destroy
-        run: terraform destroy -auto-approve tfplan
+        run: terraform destroy -auto-approve
 
 
