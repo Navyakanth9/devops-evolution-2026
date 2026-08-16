@@ -22,10 +22,9 @@ jobs:
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::955030484164:role/root-gha-role
+          role-to-assume: arn:aws:iam::955030484164:role/Terraform-user
           aws-region: ap-south-2
           role-session-name: terraform-session
-          unset-current-credentials: true
 
       # 3. Terraform Init
       - name: Terraform Init
