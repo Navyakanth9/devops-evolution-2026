@@ -6,14 +6,14 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket       = "terraform-remote-state-nk"
-    key          = "global/s3/terraform.tfstate"
-    encrypt      = true
-    use_lockfile = true
-    region       = "ap-south-2"
-  }
-}
+#   backend "s3" {
+#     bucket       = "terraform-remote-state-nk"
+#     key          = "global/s3/terraform.tfstate"
+#     encrypt      = true
+#     use_lockfile = true
+#     region       = "ap-south-2"
+#   }
+# }
 
 
 provider "aws" {
