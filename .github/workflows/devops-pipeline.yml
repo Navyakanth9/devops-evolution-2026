@@ -28,14 +28,14 @@ jobs:
 
       # 3. Terraform Init
       - name: Terraform Init
-        run: terraform init  
+        run: sudo terraform init  
 
       # 4. Terraform Plan
       - name: Terraform Plan  
-        run: terraform plan -out=tfplan
+        run: sudo terraform plan -out=tfplan
 
       # 5. Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: sudo terraform apply -auto-approve tfplan
 
 
