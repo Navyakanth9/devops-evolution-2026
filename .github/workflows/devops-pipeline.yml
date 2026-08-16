@@ -41,7 +41,7 @@ jobs:
 
       # 4. Terraform Plan
       - name: Terraform Plan  
-        run:  terraform plan -out=tfplan
+        run:  terraform plan
 
       # 5. Terraform Apply
       - name: Terraform Apply
