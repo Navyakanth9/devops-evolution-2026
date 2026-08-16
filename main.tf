@@ -14,11 +14,12 @@ terraform {
 #     region       = "ap-south-2"
 #   }
 # }
-
-
-provider "aws" {
-  region = var.aws_region
 }
+
+
+# provider "aws" {
+#   region = var.aws_region
+# }
 
 module "enterprise_web_app" {
   source = "./modules/enterprise_web_app"
