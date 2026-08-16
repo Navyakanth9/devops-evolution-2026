@@ -6,14 +6,18 @@ terraform {
     }
   }
 
-#   backend "s3" {
-#     bucket       = "terraform-remote-state-nk"
-#     key          = "global/s3/terraform.tfstate"
-#     encrypt      = true
-#     use_lockfile = true
-#     region       = "ap-south-2"
-#   }
-# }
+ # THE BULLETPROOF ENTERPRISE BACKEND
+  backend "s3" {
+    bucket  = "terraform-remote-state-nk"
+    key     = "global/s3/terraform.tfstate"
+    region  = "ap-south-2"
+    encrypt = true
+    # We omit use_lockfile completely here to remove any version compilation friction
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
 }
 
 
