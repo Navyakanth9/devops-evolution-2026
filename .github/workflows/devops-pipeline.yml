@@ -23,7 +23,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::955030484164:role/root-gha-role
-          aws-region: ap-southeast-2
+          aws-region: ap-south-2
           role-session-name: terraform-session
 
       # 3. Terraform Init
