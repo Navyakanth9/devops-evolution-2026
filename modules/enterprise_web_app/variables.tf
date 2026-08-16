@@ -41,7 +41,8 @@ variable "public_key_path" {
 
   # defining the path to the public key file for the key pair. This is used to create the key pair in AWS.
   # default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCgq1cjS4sqiX/x43v4HBR/sXaXdznlh4/0ccX0+SdxED/hTZFiL4N94veJ8fM4CNDZXLitpRRCNZK4f6k7OIFqMNpxSR2CG4I55tKUQsfPcOUvptEfojKE1B4NTiUnyIMgMhxgIABKSz3GpeeJ1SIa17k/6Dvgit6Le6vW2yymsiSYIDiHShVmWU9GRM2Lf70isQKSt802jKqOdDIqgK2cEIZo1bZPSS8BeaQ5ap/fZ6XPN6Fhmsj943yZ9DGQBteuv6KRdjcv5ixlEKrahVkQMpVhJ84xnR9CIiPoWRhxgqe5uvorazWDRuTlU1Uv2PID3nl/QGcbLX9/zv8lu/qb"
-  default = "C:/Users/amshu_e35w1je/OneDrive/Desktop/Nav/Devops-Evolution-2026/AWS/aws-pubkey.pub"
+  # default = "C:/Users/amshu_e35w1je/OneDrive/Desktop/Nav/Devops-Evolution-2026/AWS/aws-pubkey.pub"
+  default = "./aws-pubkey.pub"
 }
 
 
