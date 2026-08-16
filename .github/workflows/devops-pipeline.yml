@@ -44,7 +44,7 @@ jobs:
         run:  terraform plan -out=tfplan -input=false
 
       # 5. Terraform Apply
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve tfplan
 
 
