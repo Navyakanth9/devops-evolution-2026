@@ -2,8 +2,8 @@
 # 1. THE BOUNDARY: Create the VPC
 
 resource "aws_vpc" "custom_vpc" {
-  cidr_block = var.vpc_cidr
-  enable_dns_hostnames   = true
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
 
   tags = { Name = var.project_tags["Name"] }
 }
@@ -29,7 +29,7 @@ resource "aws_route_table" "public_route_table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id 
+    gateway_id = aws_internet_gateway.igw.id
   }
   tags = { Name = var.project_tags["Name"] }
 }
@@ -73,7 +73,7 @@ resource "aws_security_group" "web_sg" {
 # 6. THE AUTHENTICATION: Import your existing local Laptop PEM Key
 resource "aws_key_pair" "my_key" {
   key_name   = var.key_pair_name
-  public_key = file(var.public_key_path) 
+  public_key = file(var.public_key_path)
 }
 
 # 7. THE ENGINE: Fetch Latest Linux AMI
@@ -90,7 +90,7 @@ resource "aws_instance" "web_server" {
 
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
-  user_data_base64    = filebase64(var.script_path)
+  user_data_base64 = filebase64(var.script_path)
 
   tags = { Name = var.project_tags["Name"] }
 }
