@@ -1,8 +1,10 @@
 name: DevOps Evolution CI-CD Pipeline
 
 on:
-  workflow_dispatch:
-    # branches: [hardcode]
+    push:
+      branches:
+        - hardcode
+    workflow_dispatch:
 
 # CRUCIAL FOR OIDC: Allows the runner to request secure identity tokens from AWS
 permissions:
@@ -12,25 +14,26 @@ permissions:
 jobs:
   terraform-pipeline:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: "ap-south-2"
     
     steps:
       # 1. Clone the repository code
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
-      # 2. Configure AWS Credentials
-      - name: Configure AWS Credentials via OIDC
+      # Step 2: Authenticate to AWS via OIDC
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::955030484164:role/Terraform-user
-          aws-region: ap-south-2
-          role-session-name: terraform-session
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN}} 
 
      #install terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.0
+          terraform_version: 1.9.0
 
       # 3. Terraform Init
       - name: Terraform Init
