@@ -113,7 +113,7 @@ jobs:
         if: github.event.inputs.action != 'destroy'
         run: |
           # Fetch tracking strings from your outputs configuration layer
-          PUBLIC_IP=$(terraform output -raw prod_server_ip)
+          PUBLIC_IP=$(terraform output -raw prod_sever_ip)
           SERVER_URL=$(terraform output -raw prod_web_server_url)
           SSH_CMD=$(terraform output -raw prod_ssh_command)
           
