@@ -6,6 +6,16 @@ on:
     branches:
       - main
       - hardcode
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose your Infrastructure Operation'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 permissions:
   id-token: write
@@ -36,6 +46,18 @@ jobs:
       
       - name: Initialize Terraform
         run: terraform init
+
+      # EVALUATES WHETHER TO GENERATE A DEPLOYMENT PLAN OR A DESTRUCTION PLAN
+      - name: Generate Spec Plan
+        id: plan_step
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            echo "Generating destruction manifest blueprint..."
+            terraform plan -destroy -out=tfplan
+          else
+            echo "Generating standard deployment manifest blueprint..."
+            terraform plan -out=tfplan
+          fi
 
       - name: Generate Spec plan
         run: terraform plan -out=tfplan
@@ -85,8 +107,25 @@ jobs:
 
       - name: Execute Controlled Deployment
         run: terraform apply -auto-approve tfplan
-
-    #Renamed Env to PROD
+      
+        # DYNAMIC SUMMARY GENERATION STEP
+      - name: Generate Live Summary Dashboard
+        if: github.event.inputs.action != 'destroy'
+        run: |
+          # Fetch tracking strings from your outputs configuration layer
+          PUBLIC_IP=$(terraform output -raw production_web_server_ip)
+          SERVER_URL=$(terraform output -raw production_web_server_url)
+          SSH_CMD=$(terraform output -raw production_ssh_command)
+          
+          # Stream clean Markdown text blocks into GitHub's built-in summary page parameter
+          echo "### 🚀 DEPLOYMENT COMPLETED SUCCESSFULLY" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "* **Public IP Address:** \`$PUBLIC_IP\`" >> $GITHUB_STEP_SUMMARY
+          echo "* **Live Application Link:** [Click to Open Web App]($SERVER_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "* **Secure Connection Terminal String:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "$SSH_CMD" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
 
 
