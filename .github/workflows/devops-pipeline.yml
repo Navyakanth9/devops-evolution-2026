@@ -1,50 +1,92 @@
-name: DevOps Evolution CI-CD Pipeline
+---
+name: DevOps Evolution 2026 Pipeline
 
 on:
-    push:
-      branches:
-        - hardcode
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+      - hardcode
 
-# CRUCIAL FOR OIDC: Allows the runner to request secure identity tokens from AWS
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  terraform-pipeline:
+  #=====================================
+  # STAGE 1: THE PLAN & VALIDATION LOOP
+  #======================================
+
+  terraform-plan:
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: "ap-south-2"
-    
     steps:
-      # 1. Clone the repository code
-      - name: Checkout Code Repository
+      - name: checkouy repository
         uses: actions/checkout@v4
 
-      # Step 2: Authenticate to AWS via OIDC
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN}} 
+          role-to-assume: ${{secrets.AWS_IAM_ROLE_ARN}}
+          aws-region: ap-south-2
+          role-session-name: terraform-plan-session
 
-     #install terraform
+      - name: Install Terraform Engine
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.0
+      
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Generate Spec plan
+        run: terraform plan -out=tfplan
+
+            # ARCHITECTURAL STEP: Upload the plan file securely to GitHub's storage memory  
+      - name: Save Execution Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-tfplan
+          path: tfplan
+          retention-days: 1
+  # ==========================================
+  # STAGE 2: THE CONTROLLED DEPLOYMENT GATE
+  # ==========================================
+  terraform-apply:
+    runs-on: ubuntu-latest
+    # CRUCIAL: Do not run the apply unless the plan job finishes completely green!
+    needs: terraform-plan
+        # Ties this specific job to an explicit environment gate inside GitHub
+    environment: Prod
+    
+    steps:
+      - name: Checkout Code repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with: 
+          role-to-assume: ${{secrets.AWS_IAM_ROLE_ARN}}
+          aws-region: ap-south-2
+          role-session-name: terraform-apply-session
+          
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.9.0
+          terraform_version: 1.10.0
+          
+      - name: Initialize Terraform
+        run: terraform init
 
-      # 3. Terraform Init
-      - name: Terraform Init
-        run: terraform init  
+      # Download the exact, validated plan binary artifact generated in Job 1
+      
+      - name: Download the Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-tfplan
 
-      # 4. Terraform Plan
-      - name: Terraform Plan  
-        run:  terraform plan -out=tfplan -input=false
+      - name: Execute Controlled Deployment
+        run: terraform apply -auto-approve tfplan
 
-      # 5. Terraform Apply
-      - name: Terraform destroy
-        run: terraform destroy -auto-approve
+
+
 
 

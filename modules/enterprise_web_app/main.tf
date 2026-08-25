@@ -3,7 +3,7 @@
 
 resource "aws_vpc" "custom_vpc" {
   cidr_block           = var.vpc_cidr
-  enable_dns_hostnames = true
+  enable_dns_hostnames = true #This enables DNS hostnames for instances launched in the VPC, allowing them to be accessed by their public DNS names.
 
   tags = { Name = var.project_tags["Name"] }
 }
@@ -12,7 +12,7 @@ resource "aws_vpc" "custom_vpc" {
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.custom_vpc.id
   cidr_block              = var.public_subnet_cidr
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = true #This ensures that instances launched in this subnet receive a public IP address automatically.
 
   tags = { Name = var.project_tags["Name"] }
 }
@@ -28,14 +28,15 @@ resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.custom_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
+    cidr_block = "0.0.0.0/0" #This route allows traffic to any destination 
+    gateway_id = aws_internet_gateway.igw.id #This specifies that the traffic should be routed through the internet gateway created earlier, enabling instances in the VPC to communicate with the internet.
   }
   tags = { Name = var.project_tags["Name"] }
 }
 
 
 # Link the direction rules directly to our room (Subnet)
+#This resource associates the public subnet with the route table, ensuring that instances in the subnet can access the internet through the internet gateway.
 resource "aws_route_table_association" "public_subnet_association" {
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_route_table.id
@@ -47,21 +48,21 @@ resource "aws_security_group" "web_sg" {
   description = "Allow SSH and HTTP traffic"
   vpc_id      = aws_vpc.custom_vpc.id
 
-  ingress {
+  ingress { #This block defines the inbound rules for the security group.
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # Allow SSH access from any IP
   }
 
-  ingress {
+  ingress { #This block defines the inbound rules for the security group.
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # Allow HTTP access from any IP
   }
 
-  egress {
+  egress { #This block defines the outbound rules for the security group.
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -86,7 +87,7 @@ resource "aws_instance" "web_server" {
   ami           = data.aws_ssm_parameter.amazon_linux_2023.value
   instance_type = var.instance_type
   subnet_id     = aws_subnet.public_subnet.id
-  key_name      = aws_key_pair.my_key.key_name
+  key_name      = aws_key_pair.my_key.key_name #This specifies the key pair to use for SSH access to the EC2 instance. The key pair is created earlier in the configuration using the public key provided by the user.
 
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
