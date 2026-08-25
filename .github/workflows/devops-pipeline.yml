@@ -113,9 +113,9 @@ jobs:
         if: github.event.inputs.action != 'destroy'
         run: |
           # Fetch tracking strings from your outputs configuration layer
-          PUBLIC_IP=$(terraform output -raw production_web_server_ip)
-          SERVER_URL=$(terraform output -raw production_web_server_url)
-          SSH_CMD=$(terraform output -raw production_ssh_command)
+          PUBLIC_IP=$(terraform output -raw prod_web_server_ip)
+          SERVER_URL=$(terraform output -raw prod_web_server_url)
+          SSH_CMD=$(terraform output -raw prod_ssh_command)
           
           # Stream clean Markdown text blocks into GitHub's built-in summary page parameter
           echo "### 🚀 DEPLOYMENT COMPLETED SUCCESSFULLY" >> $GITHUB_STEP_SUMMARY
