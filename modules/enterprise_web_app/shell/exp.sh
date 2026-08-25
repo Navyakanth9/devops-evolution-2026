@@ -4,7 +4,7 @@ dnf install -y httpd
 systemctl start httpd
 systemctl enable httpd
 
-cat << 'EOF' > /var/www/html/index.html
+cat << 'EOF' > /var/www/html/index.html #This defines the content of the index.html file that will be served by the Apache web server. The content is a simple HTML page with a purple background and white text, indicating that this is a "PURPLE DEPLOYMENT (v2)" and that the code has changed dynamically. The EOF marker indicates the end of the content being written to the index.html file.
 <!DOCTYPE html>
 <html>
 <head>
