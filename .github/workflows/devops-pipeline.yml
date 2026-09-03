@@ -109,6 +109,17 @@ jobs:
         run: terraform apply -auto-approve tfplan
       
         # DYNAMIC SUMMARY GENERATION STEP
+      - name: Execute Controlled Deployment or Destruction
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            echo "🚨 UI Choice detected: Executing verified safe destruction lifecycle..."
+            terraform apply -auto-approve tfplan
+          else
+            echo "🚀 UI Choice detected: Executing verified standard deployment lifecycle..."
+            terraform apply -auto-approve tfplan
+          fi
+
+
       - name: Generate Live Summary Dashboard
         if: github.event.inputs.action != 'destroy'
         run: |
