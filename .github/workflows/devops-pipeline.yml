@@ -105,8 +105,8 @@ jobs:
         with:
           name: terraform-tfplan
 
-      - name: Execute Controlled Deployment
-        run: terraform apply -auto-approve tfplan
+      # - name: Execute Controlled Deployment
+      #   run: terraform apply -auto-approve tfplan
       
         # DYNAMIC SUMMARY GENERATION STEP
       - name: Execute Controlled Deployment or Destruction
