@@ -59,10 +59,10 @@ jobs:
             terraform plan -out=tfplan
           fi
 
-      - name: Generate Spec plan
-        run: terraform plan -out=tfplan
+      # - name: Generate Spec plan
+      #   run: terraform plan -out=tfplan
 
-            # ARCHITECTURAL STEP: Upload the plan file securely to GitHub's storage memory  
+      # ARCHITECTURAL STEP: Upload the plan file securely to GitHub's storage memory  
       - name: Save Execution Plan Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -105,20 +105,8 @@ jobs:
         with:
           name: terraform-tfplan
 
-      # - name: Execute Controlled Deployment
-      #   run: terraform apply -auto-approve tfplan
-      
-        # DYNAMIC SUMMARY GENERATION STEP
-      - name: Execute Controlled Deployment or Destruction
-        run: |
-          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-            echo "🚨 UI Choice detected: Executing verified safe destruction lifecycle..."
-            terraform apply -auto-approve tfplan
-          else
-            echo "🚀 UI Choice detected: Executing verified standard deployment lifecycle..."
-            terraform apply -auto-approve tfplan
-          fi
-
+      - name: Execute Controlled Deployment
+        run: terraform apply -auto-approve tfplan
 
       - name: Generate Live Summary Dashboard
         if: github.event.inputs.action != 'destroy'
