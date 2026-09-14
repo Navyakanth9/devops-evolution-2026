@@ -7,7 +7,18 @@ on:
       - main
       - hardcode
   workflow_dispatch:
+     # INPUT 1: THE TARGET WORKSPACE
     inputs:
+      environment:
+        description: "Select your environment"
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+     # INPUT 2:  THE LIFECYCLE ACTION   
       action:
         description: 'Choose your Infrastructure Operation'
         required: true
@@ -46,6 +57,16 @@ jobs:
       
       - name: Initialize Terraform
         run: terraform init
+        
+     # WORKSPACE AUTOMATION HANDSHAKE
+      - name: Select or Create Workspace Environment
+        run: |
+          # Read input environment selection, default to dev if triggered via code push
+          TARGET_ENV="${{ github.event.inputs.environment || 'dev' }}"
+          echo "Target isolation workspace: $TARGET_ENV"
+          
+          # Tell Terraform to try selecting the room. If it doesn't exist, create it live!
+          terraform workspace select $TARGET_ENV || terraform workspace new $TARGET_ENV
 
       # EVALUATES WHETHER TO GENERATE A DEPLOYMENT PLAN OR A DESTRUCTION PLAN
       - name: Generate Spec Plan
@@ -98,6 +119,16 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
+        
+      # WORKSPACE AUTOMATION HANDSHAKE
+      - name: Select or Create Workspace Environment
+        run: |
+          # Read input environment selection, default to dev if triggered via code push
+          TARGET_ENV="${{ github.event.inputs.environment || 'dev' }}"
+          echo "Target isolation workspace: $TARGET_ENV"
+          
+          # Tell Terraform to try selecting the room. If it doesn't exist, create it live!
+          terraform workspace select $TARGET_ENV || terraform workspace new $TARGET_ENV
       # Download the exact, validated plan binary artifact generated in Job 1
       
       - name: Download the Artifact
