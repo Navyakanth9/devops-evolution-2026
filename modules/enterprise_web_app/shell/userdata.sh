@@ -73,7 +73,7 @@ cat << 'HTML_EOF' > /var/www/html/index.html
     <div class="container">
         <h1>CONGRATULATIONS, NAVYAKANTH! 🚀</h1>
         <h2>Modular Web Server Successfully Deployed via Terraform</h2>
-        <div class="badge">STATUS: PIPELINE EXECUTED SUCCESSFULLY</div>
+        <div class="badge">STATUS: PIPELINE EXECUTED SUCCESSFULLY AND IS LIVE</div>
     </div>
 </body>
 </html>
