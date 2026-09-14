@@ -52,7 +52,7 @@ jobs:
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf*') }}
           restore-keys: |
             ${{ runner.os }}-terraform-
-                      
+
 
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -184,9 +184,9 @@ jobs:
 
           # 3. Append resource connection details ONLY if it wasn't a teardown execution
           if [ "$ACTION_OP" != "destroy" ] && [ "${{ job.status }}" == "success" ]; then
-            PUBLIC_IP=$(terraform output -raw production_web_server_ip)
-            SERVER_URL=$(terraform output -raw production_web_server_url)
-            SSH_CMD=$(terraform output -raw production_ssh_command)
+            PUBLIC_IP=$(terraform output -raw prod_sever_ip)
+            SERVER_URL=$(terraform output -raw prod_web_server_url)
+            SSH_CMD=$(terraform output -raw prod_ssh_command)
             
             echo "### 🟢 LIVE INFRASTRUCTURE ENDPOINTS" >> $GITHUB_STEP_SUMMARY
             echo "* **Public IP Address:** \`$PUBLIC_IP\`" >> $GITHUB_STEP_SUMMARY
