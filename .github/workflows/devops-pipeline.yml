@@ -40,8 +40,19 @@ jobs:
   terraform-plan:
     runs-on: ubuntu-latest
     steps:
-      - name: checkouy repository
+      - name: checkout repository
         uses: actions/checkout@v4
+
+      - name: Cache Terraform Dependency Modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            .terraform/
+            .terraform.lock.hcl
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf*') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+                      
 
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -104,6 +115,17 @@ jobs:
       - name: Checkout Code repository
         uses: actions/checkout@v4
 
+      - name: Cache Terraform Dependency Modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            .terraform/
+            .terraform.lock.hcl
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf*') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+  
+
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with: 
@@ -139,23 +161,45 @@ jobs:
       - name: Execute Controlled Deployment
         run: terraform apply -auto-approve tfplan
 
+            # DYNAMIC SUMMARY GENERATION STEP (WITH RUNTIME AUDIT CARD)
       - name: Generate Live Summary Dashboard
-        if: github.event.inputs.action != 'destroy'
+        if: always() # Forces this card to print on both Applys and Destroys!
         run: |
-          # Fetch tracking strings from your outputs configuration layer
-          PUBLIC_IP=$(terraform output -raw prod_sever_ip)
-          SERVER_URL=$(terraform output -raw prod_web_server_url)
-          SSH_CMD=$(terraform output -raw prod_ssh_command)
+          # 1. Extract inputs and contextual run metadata strings
+          TARGET_ENV="${{ github.event.inputs.environment || 'dev' }}"
+          ACTION_OP="${{ github.event.inputs.action || 'push-deploy' }}"
+          TRIGGERED_BY="${{ github.actor }}"
+          RUN_ID="${{ github.run_id }}"
           
-          # Stream clean Markdown text blocks into GitHub's built-in summary page parameter
-          echo "### 🚀 DEPLOYMENT COMPLETED SUCCESSFULLY" >> $GITHUB_STEP_SUMMARY
+          # 2. Build the high-visibility Run Summary Audit Card
+          echo "## 📊 GITOPS PIPELINE RUN AUDIT METADATA" >> $GITHUB_STEP_SUMMARY
+          echo "│ Component │ Active Operational Value │" >> $GITHUB_STEP_SUMMARY
+          echo "├───────────┼──────────────────────────┤" >> $GITHUB_STEP_SUMMARY
+          echo "│ 👤 **Triggered By User** │ @$TRIGGERED_BY │" >> $GITHUB_STEP_SUMMARY
+          echo "│ 🚀 **Target Workspace**  │ \`$TARGET_ENV\` │" >> $GITHUB_STEP_SUMMARY
+          echo "│ 🛠️ **Requested Action**  │ \`$ACTION_OP\` │" >> $GITHUB_STEP_SUMMARY
+          echo "│ 🆔 **Workflow Run ID**   │ \`$RUN_ID\` │" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "* **Public IP Address:** \`$PUBLIC_IP\`" >> $GITHUB_STEP_SUMMARY
-          echo "* **Live Application Link:** [Click to Open Web App]($SERVER_URL)" >> $GITHUB_STEP_SUMMARY
-          echo "* **Secure Connection Terminal String:**" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "$SSH_CMD" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          # 3. Append resource connection details ONLY if it wasn't a teardown execution
+          if [ "$ACTION_OP" != "destroy" ] && [ "${{ job.status }}" == "success" ]; then
+            PUBLIC_IP=$(terraform output -raw production_web_server_ip)
+            SERVER_URL=$(terraform output -raw production_web_server_url)
+            SSH_CMD=$(terraform output -raw production_ssh_command)
+            
+            echo "### 🟢 LIVE INFRASTRUCTURE ENDPOINTS" >> $GITHUB_STEP_SUMMARY
+            echo "* **Public IP Address:** \`$PUBLIC_IP\`" >> $GITHUB_STEP_SUMMARY
+            echo "* **Live Application Link:** [Click to Open Web App]($SERVER_URL)" >> $GITHUB_STEP_SUMMARY
+            echo "* **Secure Connection Terminal String:**" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+            echo "$SSH_CMD" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          elif [ "$ACTION_OP" == "destroy" ] && [ "${{ job.status }}" == "success" ]; then
+            echo "### 🚨 INFRASTRUCTURE TEARDOWN METRICS CONFIRMED" >> $GITHUB_STEP_SUMMARY
+            echo "💥 **Status:** The isolated state room \`$TARGET_ENV\` has been completely decommissioned and synchronized to a \$0 zero-resource baseline." >> $GITHUB_STEP_SUMMARY
+          fi
+
 
 
 

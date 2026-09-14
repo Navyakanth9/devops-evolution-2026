@@ -92,6 +92,22 @@ resource "aws_instance" "web_server" {
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   user_data_base64 = filebase64(var.script_path)
+  # OPTIMIZATION 1: PREVENT TOTAL INSTANCE DESTRUCTION ON BASH CHANGELOGS
+  user_data_replace_on_change = false
+ # OPTIMIZATION 2: TAG DYNAMICALLY BY WORKSPACE IDENTITY
+  tags = merge(
+    var.project_tags,
+    {
+      Name        = "Enterprise-Web-Server-${terraform.workspace}"
+      Environment = terraform.workspace
+      ManagedBy   = "Terraform-GitOps"
+    }
+  )
 
-  tags = { Name = var.project_tags["Name"] }
+  # OPTIMIZATION 3: SAFE LIFECYCLE GUARD
+  lifecycle {
+    ignore_changes = [
+      user_data_base64 # Stops script tweaks from tearing down the hardware asset!
+    ]
+  }
 }
